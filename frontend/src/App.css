@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+.app {
+  display: flex;
+  font-family: "Poppins", sans-serif;
+  background-image: url("./assets/bg-image.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.hover-effect {
+  transition: all 0.3s ease;
+}
+.hover-effect:hover {
+  transition: all 0.3s ease;
+  background-color: rgb(200, 200, 200);
+}
+
+.div-shadow {
+  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 2px, rgba(0, 0, 0, 0.07) 0px 2px 4px,
+    rgba(0, 0, 0, 0.07) 0px 4px 8px, rgba(0, 0, 0, 0.07) 0px 8px 16px,
+    rgba(0, 0, 0, 0.07) 0px 16px 32px, rgba(0, 0, 0, 0.07) 0px 32px 64px;
+}
+
+.brt {
+  border-top: 1px solid rgb(173, 172, 172);
+}
+.brr {
+  border-right: 1px solid rgb(173, 172, 172);
+}
+.brb {
+  border-bottom: 1px solid rgb(173, 172, 172);
+}
+.brl {
+  border-left: 1px solid rgb(173, 172, 172);
+}
