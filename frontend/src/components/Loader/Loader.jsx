@@ -3,7 +3,13 @@ import React from "react";
 
 const Loader = () => {
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" mt={"4"}>
+    <Box
+      display="flex"
+      justifyContent="center"
+      m={"auto"}
+      alignItems="center"
+      mt={"4"}
+    >
       <Spinner size="xl" color="blue.500" />
     </Box>
   );

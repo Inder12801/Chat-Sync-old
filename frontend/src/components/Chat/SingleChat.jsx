@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ChatState } from "../../context/ChatProvider";
 import {
   Avatar,
@@ -18,19 +18,102 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  FormControl,
+  Input,
+  useToast,
 } from "@chakra-ui/react";
 import { IoChatbubbles } from "react-icons/io5";
-import { AiOutlineArrowLeft, AiOutlineMenu } from "react-icons/ai";
+import {
+  AiOutlineArrowLeft,
+  AiOutlineMenu,
+  AiOutlineSend,
+} from "react-icons/ai";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { CiMenuKebab } from "react-icons/ci";
+import UpdateGroupChatModal from "../GroupChat/UpdateGroupChatModal";
+import Loader from "../Loader/Loader";
+import axios from "axios";
+import ScrollableChat from "./ScrollableChat";
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  console.log(selectedChat);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState();
+  const toast = useToast();
+  // console.log(selectedChat);
   const getSenderFull = (loggedUser, users) => {
     return users[0]._id === loggedUser._id ? users[1] : users[0];
   };
+
+  const fetchAllMessages = async () => {
+    if (!selectedChat) return;
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+      };
+      setLoading(true);
+      const res = await axios.get(`/api/message/${selectedChat._id}`, config);
+      console.log(res.data);
+      setMessages(res.data);
+      setLoading(false);
+    } catch (error) {
+      //write a toast
+      toast({
+        title: "An error occurred.",
+        description: "Unable to fetch messages.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const sendMessage = async (e) => {
+    if (e.key === "Enter" && newMessage) {
+      try {
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        };
+        const res = await axios.post(
+          "/api/message",
+          {
+            content: newMessage,
+            chatId: selectedChat._id,
+          },
+          config
+        );
+        setNewMessage("");
+        console.log(res.data);
+        setMessages([...messages, res.data]);
+      } catch (error) {
+        //write a toast
+        toast({
+          title: "An error occurred.",
+          description: "Unable to send message.",
+          status: "error",
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
+  const typingHandler = (value) => {
+    setNewMessage(value);
+    //Typing indicator logic
+  };
+  useEffect(() => {
+    fetchAllMessages();
+  }, [selectedChat]);
+
   return (
     <>
       {selectedChat ? (
@@ -84,6 +167,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             menu open which has an option of edit Group */}
             <Menu>
               <MenuButton
+                display={selectedChat.isGroupChat ? "inline" : "none"}
                 p={0}
                 as={Button}
                 rightIcon={<CiMenuKebab />}
@@ -92,20 +176,60 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
               <MenuList>
                 <MenuItem>
-                  <Text onClick={onOpen}>Edit Group</Text>
-                  <Modal isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                      <ModalHeader>Modal Title</ModalHeader>
-                      <ModalCloseButton />
-                      <ModalBody></ModalBody>
-
-                      <ModalFooter></ModalFooter>
-                    </ModalContent>
-                  </Modal>
+                  <Text onClick={onOpen}>
+                    <UpdateGroupChatModal
+                      fetchAgain={fetchAgain}
+                      setFetchAgain={setFetchAgain}
+                      fetchAllMessages={fetchAllMessages}
+                    />
+                  </Text>
                 </MenuItem>
               </MenuList>
             </Menu>
+          </Box>
+          <Box
+            w={"100%"}
+            height={"91%"}
+            display={"flex"}
+            flexDirection={"column"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            bgColor={"#e6e6e3"}
+            borderRadius={"20px"}
+            p={3}
+            mt={3}
+          >
+            {loading ? (
+              <Loader />
+            ) : (
+              <div
+                style={{ width: "100%", bgColor: "green", overflow: "auto" }}
+              >
+                <ScrollableChat loggedInUser={user} messages={messages} />
+              </div>
+            )}
+            <FormControl
+              isRequired
+              onKeyDown={sendMessage}
+              display={"flex"}
+              gap={2}
+            >
+              <Input
+                type="text"
+                placeholder="Type a message"
+                onChange={(e) => typingHandler(e.target.value)}
+                value={newMessage || ""}
+              />
+              {/* <Button
+                bgColor={"#96f7fa"}
+                color={"black"}
+                variant={"filled"}
+                rightIcon={<AiOutlineSend />}
+                onClick={sendMessage}
+              >
+                send
+              </Button> */}
+            </FormControl>
           </Box>
         </>
       ) : (

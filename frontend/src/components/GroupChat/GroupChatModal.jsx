@@ -23,8 +23,8 @@ import UserBadge from "./UserBadge";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [groupChatName, setGroupChatName] = useState();
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [groupChatName, setGroupChatName] = useState();
   const [search, setSearch] = useState();
   const [searchResults, setSearchResults] = useState();
   const [loading, setLoading] = useState(false);
@@ -194,7 +194,6 @@ const GroupChatModal = ({ children }) => {
               ))
             )}
           </ModalBody>
-
           <ModalFooter>
             <Button variant={"ghost"} onClick={() => handleSubmit()}>
               Create Chat

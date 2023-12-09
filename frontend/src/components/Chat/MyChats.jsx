@@ -95,6 +95,7 @@ const MyChats = ({ fetchAgain }) => {
                   width={"100%"}
                   p={"10px"}
                   borderRadius={"20px"}
+                  className={selectedChat === chat ? "" : "hover-effect"}
                 >
                   {!chat.isGroupChat ? (
                     <Text

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connectToDB } from "./config/connectToDB.js";
 import userRoute from "./routes/userRoute.js";
 import chatRoute from "./routes/chatRoute.js";
+import messageRoute from "./routes/messageRoute.js";
 
 // creating a server
 const app = express();
@@ -12,12 +13,14 @@ const app = express();
 app.use(express.json());
 dotenv.config();
 
-// connect o database
+// connect to database
 connectToDB();
 
 app.use("/api/user", userRoute);
 
 app.use("/api/chat", chatRoute);
+
+app.use("/api/message", messageRoute);
 
 app.get("/api/chat/:id", (req, res) => {
   const chat = chats.find((chat) => chat._id === req.params.id);
