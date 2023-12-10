@@ -26,7 +26,8 @@ const Header = () => {
       bgColor={"white"}
       p={"4px 10px"}
       borderRadius={"0px 20px 0 0px"}
-      className="div-shadow"
+      boxShadow="md"
+      // className="div-shadow"
     >
       <SearchDrawer />
       <Box>

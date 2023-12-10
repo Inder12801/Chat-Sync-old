@@ -5,11 +5,12 @@ import moment from "moment";
 
 const ScrollableChat = ({ messages, loggedInUser }) => {
   return (
-    <ScrollableFeed>
+    <>
       {messages.map((message, index) => (
-        <Flex
+        <Box
           key={index}
-          direction={
+          display={"flex"}
+          flexDirection={
             message.sender._id === loggedInUser._id ? "row-reverse" : "row"
           }
           align="center"
@@ -26,22 +27,24 @@ const ScrollableChat = ({ messages, loggedInUser }) => {
           )}
 
           <Box
-            maxW="70%"
+            maxW="40%"
             bg={
-              message.sender._id === loggedInUser._id ? "#86cbea" : "gray.400"
+              message.sender._id === loggedInUser._id ? "cyan.500" : "gray.400"
             }
             color={message.sender._id === loggedInUser._id ? "white" : "black"}
             p={3}
             borderRadius="20px"
           >
-            <Text fontSize="xs">{message.content}</Text>
-            <Text fontSize="xx-small" textAlign="right" mt={1}>
+            <Text fontSize="xs" color={"black"}>
+              {message.content}
+            </Text>
+            <Text fontSize="xx-small" color={"black"} textAlign="right" mt={1}>
               {moment(message.createdAt).format("LT")}
             </Text>
           </Box>
-        </Flex>
+        </Box>
       ))}
-    </ScrollableFeed>
+    </>
   );
 };
 

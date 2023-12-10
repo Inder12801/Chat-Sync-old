@@ -40,3 +40,46 @@ export const allMessages = expressAsyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+
+// Delete message by ID
+export const deleteMessage = expressAsyncHandler(async (req, res) => {
+  const messageId = req.params.messageId;
+
+  try {
+    // Find the message by ID
+    const message = await Message.findById(messageId);
+
+    // Check if the message exists
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // Check if the user is authorized to delete the message
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Unauthorized access" });
+    }
+
+    // Delete the message
+    const delMsg = await Message.findByIdAndDelete(
+      { _id: messageId },
+      { new: true }
+    );
+    console.log(delMsg);
+
+    // Update the latest message of the chat
+    const chat = await Chat.findById(message.chat);
+    let latestMessage = null;
+    const messages = await Message.find({ chat: message.chat });
+    if (messages.length > 0) {
+      latestMessage = messages[messages.length - 1];
+    }
+    await Chat.findByIdAndUpdate(message.chat, {
+      latestMessage,
+    });
+
+    res.json({ message: "Message deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});

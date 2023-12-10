@@ -6,6 +6,7 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [selectedChat, setSelectedChat] = useState();
   const [chats, setChats] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
   const value = {
     user,
@@ -14,6 +15,8 @@ const ChatProvider = ({ children }) => {
     setSelectedChat,
     chats,
     setChats,
+    notifications,
+    setNotifications,
   };
 
   // Get the current logged in user. If there is no user, redirect to login page.

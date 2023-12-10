@@ -9,10 +9,10 @@ const ChatBox = ({ fetchAgain, setFetchAgain }) => {
     <Box
       // width={"69%"}
       p={3}
-      m={2}
+      // m={2}
       height={"97%"}
       borderRadius={"20px"}
-      className="div-shadow"
+      // className="div-shadow"
       flex={2}
     >
       <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />

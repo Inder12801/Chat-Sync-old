@@ -11,38 +11,45 @@ import {
   MenuList,
   Text,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   FormControl,
   Input,
   useToast,
+  Image,
 } from "@chakra-ui/react";
 import { IoChatbubbles } from "react-icons/io5";
-import {
-  AiOutlineArrowLeft,
-  AiOutlineMenu,
-  AiOutlineSend,
-} from "react-icons/ai";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 import { CiMenuKebab } from "react-icons/ci";
 import UpdateGroupChatModal from "../GroupChat/UpdateGroupChatModal";
 import Loader from "../Loader/Loader";
 import axios from "axios";
+import io from "socket.io-client";
 import ScrollableChat from "./ScrollableChat";
+import typingGif from "../../assets/typing.gif";
+
+const ENDPOINT = "http://localhost:5000";
+let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-  const { user, selectedChat, setSelectedChat } = ChatState();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    notifications,
+    setNotifications,
+  } = ChatState();
+
+  const { onOpen } = useDisclosure();
+  const [loggedInUser, setLoggedInUser] = useState(
+    JSON.parse(localStorage.getItem("userInfo")) || {}
+  );
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState();
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
   const toast = useToast();
-  // console.log(selectedChat);
   const getSenderFull = (loggedUser, users) => {
     return users[0]._id === loggedUser._id ? users[1] : users[0];
   };
@@ -58,9 +65,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       };
       setLoading(true);
       const res = await axios.get(`/api/message/${selectedChat._id}`, config);
-      console.log(res.data);
       setMessages(res.data);
       setLoading(false);
+      socket.emit("join-chat", selectedChat._id);
     } catch (error) {
       //write a toast
       toast({
@@ -91,7 +98,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           config
         );
         setNewMessage("");
-        console.log(res.data);
+        socket.emit("new-message", res.data);
         setMessages([...messages, res.data]);
       } catch (error) {
         //write a toast
@@ -109,10 +116,56 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const typingHandler = (value) => {
     setNewMessage(value);
     //Typing indicator logic
+    if (!socketConnected) return;
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = 0;
+    const TYPING_TIMER_LENGTH = 3000;
+    setTimeout(() => {
+      let timeNow = Date.now();
+      if (timeNow - lastTypingTime >= TYPING_TIMER_LENGTH && typing) {
+        socket.emit("stop-typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, TYPING_TIMER_LENGTH);
   };
   useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", loggedInUser);
+    socket.on("connected", () => {
+      setSocketConnected(true);
+    });
+    socket.on("typing", (room) => {
+      setIsTyping(true);
+    });
+    socket.on("stop-typing", (room) => {
+      setIsTyping(false);
+    });
+  }, []);
+  useEffect(() => {
     fetchAllMessages();
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message-received", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        //give notification
+        if (!notifications.includes(newMessageRecieved)) {
+          setNotifications([newMessageRecieved, ...notifications]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  });
+  console.log(notifications);
 
   return (
     <>
@@ -213,22 +266,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               onKeyDown={sendMessage}
               display={"flex"}
               gap={2}
+              // alignItems={"center"}
+              flexDirection={"column"}
             >
+              {isTyping && (
+                <Image src={typingGif} alt="Typing..." width={"80px"} />
+              )}
+
               <Input
                 type="text"
                 placeholder="Type a message"
                 onChange={(e) => typingHandler(e.target.value)}
                 value={newMessage || ""}
               />
-              {/* <Button
-                bgColor={"#96f7fa"}
-                color={"black"}
-                variant={"filled"}
-                rightIcon={<AiOutlineSend />}
-                onClick={sendMessage}
-              >
-                send
-              </Button> */}
             </FormControl>
           </Box>
         </>

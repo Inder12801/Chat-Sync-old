@@ -49,11 +49,11 @@ const MyChats = ({ fetchAgain }) => {
       flexDir={"column"}
       alignItems={"center"}
       bgColor={"white"}
-      className="div-shadow"
+      // className="div-shadow"
       w={["100%", "30%"]}
       p={3}
       height={"97%"}
-      m={2}
+      // m={2}
       borderRadius={"20px"}
       flex={1}
     >
