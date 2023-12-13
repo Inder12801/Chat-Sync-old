@@ -14,7 +14,8 @@ import { useToast } from "@chakra-ui/react";
 import React, { useState } from "react";
 import axios from "axios";
 import { saveImageToCloudinary } from "../../config/saveImageToCloudinary.js";
-import addImageIcon from "/run/media/ij-singh/My Data/Codes/WEB DEVELOPMENT/Full Stack Projects/ij chat app/frontend/src/assets/addImageIcon.png";
+import addImageIcon from "../../assets/addImageIcon.png";
+
 import { useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -223,7 +224,7 @@ const Signup = () => {
               />
             </div>
           ) : (
-            <img src={addImageIcon} />
+            <img src={addImageIcon} alt="" />
           )}
         </FormLabel>
 
