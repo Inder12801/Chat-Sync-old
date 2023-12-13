@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: import.meta.env.VITE_SERVER_API_URL,
+        target: "https://chat-sync-server.vercel.app/",
         changeOrigin: true,
         secure: false,
       },
