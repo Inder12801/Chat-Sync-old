@@ -18,7 +18,7 @@ dotenv.config();
 // connect to database
 connectToDB();
 
-app.use("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("server running succesfully!!");
 });
 
