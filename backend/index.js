@@ -18,6 +18,10 @@ dotenv.config();
 // connect to database
 connectToDB();
 
+app.use("/", (req, res) => {
+  res.send("server running succesfully!!");
+});
+
 app.use("/api/user", userRoute);
 
 app.use("/api/chat", chatRoute);
