@@ -34,12 +34,6 @@ app.get("/api/chat/:id", (req, res) => {
   res.json(chat);
 });
 
-//------------------------DEPLOYMENT------------------------------
-
-const __dirname1 = path.resolve();
-
-//------------------------DEPLOYMENT------------------------------
-
 const server = app.listen(5000, () => {
   console.log("Server is running on port : ", 5000);
 });
